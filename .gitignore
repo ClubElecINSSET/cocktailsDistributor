@@ -1,0 +1,7 @@
+.vs/
+cocktailsDistributor/__vm/
+cocktailsDistributor/Debug/
+cocktailsDistributorConfig
+cocktailsDistributor/cocktailsDistributor.vcxproj
+*.user
+*.filters
