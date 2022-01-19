@@ -3,5 +3,6 @@ cocktailsDistributor/__vm/
 cocktailsDistributor/Debug/
 cocktailsDistributorConfig
 cocktailsDistributor/cocktailsDistributor.vcxproj
+documentation/
 *.user
 *.filters
