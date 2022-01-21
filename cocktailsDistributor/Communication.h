@@ -33,10 +33,15 @@ class Communication {
     String cleanParameter(String parameter);
 
   public:
+
     Communication();
     Communication(int pinRx_, int pinTx_);
     //Communication(int pinRx_, int pinTx_, *Distributor distributor_);
     void setupCommunicationModule();
+
+  //-----------------------------------------------------------------------
+  //                    IHM --> Distributeur
+  //-----------------------------------------------------------------------
     
     void setMessage(String message_);
     String getMessage();
@@ -46,6 +51,23 @@ class Communication {
     
     //crée la commande complète
     void createCommand();
+
+  //-----------------------------------------------------------------------
+  //                    Distributeur --> IHM
+  //-----------------------------------------------------------------------
+
+    void sendSuccess();
+    void sendError();
+    void sendNeed(int slots[10]);
+    void sendProgress(int step, int progress);
+    void sendAnomaly();
+    void sendSlotStatus(int available);
+    void sendConfiguration(int quantities[10]);
+    void sendInitialized();
+    void sendWaitForCup();
+    void sendRetireCup();
+    void sendUnknown();
+
 };
 
 #endif

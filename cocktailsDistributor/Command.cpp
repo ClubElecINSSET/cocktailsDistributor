@@ -41,10 +41,3 @@ String Command::getName(){
 String Command::getParameter(int id){
   return parametersArray[id];
 }
-
-/*
-//Retourne le tableau des parametres
-String[11] Command::getParameterArray(){
-  return parametersArray;
-}
-*/

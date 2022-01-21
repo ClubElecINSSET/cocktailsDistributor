@@ -18,7 +18,6 @@ class Command {
     void clearParameters();
     String getName();
     String getParameter(int id);
-    //String[11] getParameterArray();
 };
 
 #endif

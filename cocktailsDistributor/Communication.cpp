@@ -27,9 +27,13 @@ void Communication::setupCommunicationModule(){
   BTSerial.begin(38400);
 }
 
-//--------------------------------------------------------------------
-//                          Generisation class
-//--------------------------------------------------------------------
+//-----------------------------------------------------------------------
+//                    IHM --> Distributeur
+//-----------------------------------------------------------------------
+
+    //--------------------------------------------------
+    //                   Generisation class
+    //--------------------------------------------------
 
 //Message
 void Communication::setMessage(String message_) {
@@ -68,9 +72,9 @@ void Communication::createCommand() {
 //lis les données recu par le port serie
 void Communication::readSerialPort() {
   message="";
-  while (Serial.available()) {
-    if (Serial.available() >0) {
-      char c = Serial.read();  //gets one byte from serial buffer
+  while (BTSerial.available()) {
+    if (BTSerial.available() >0) {
+      char c = BTSerial.read();  //gets one byte from serial buffer
       message += c; //makes the string readString
     }
   }
@@ -144,4 +148,76 @@ String Communication::cleanParameter(String parameter) {
     parameter.remove(parameter.length()-1, parameter.length());
   }
   return parameter;
+}
+
+
+  //-----------------------------------------------------------------------
+  //                    Distributeur --> IHM
+  //-----------------------------------------------------------------------
+
+//Envoie que la tache s'est bien déroulé
+ void Communication::sendSuccess() {
+  BTSerial.print("OK");
+}
+
+//Envoie qu'une erreur a été detecté
+void Communication::sendError() {
+  BTSerial.print("ERR");
+}
+
+//Envoie un besoin de réaprovisionnement
+void Communication::sendNeed(int slots[10]) {
+  String response = "NEED(";
+  for (int i = 0; i<9; i++) {
+    response += String(slots[i]) + ",";
+  }
+  response += String(slots[9])+")";
+  BTSerial.print(response); 
+}
+
+//Envoie l'etape et le pourcentage accomplie d'une tache
+void Communication::sendProgress(int step_, int progress) {
+  String response = String("POUR(") + step_ + "," + progress + ")";
+  BTSerial.print(response);
+}
+
+//Envoie qu'une anomalie a été detecté
+void Communication::sendAnomaly() {
+  BTSerial.print("ANOM");
+}
+
+//Envoie la quantité restante d'un liquide
+void Communication::sendSlotStatus(int available) {
+  String response = String("SLOT(") + available + ")";
+  BTSerial.print(response);
+}
+
+//Envoie la quantité restante de chaque liquide
+void Communication::sendConfiguration(int quantities[10]) {
+  String response = "CONF(";
+  for (int i = 0; i<9; i++) {
+    response += String(quantities[i]) + ",";
+  }
+  response += String(quantities[9])+")";
+  BTSerial.print(response);   
+}
+
+//Envoie initialisation réussie
+void Communication::sendInitialized() {
+  BTSerial.print("INIT");   
+}
+
+//Evoie le Besoin de poser le gobelet
+void Communication::sendWaitForCup() {
+  BTSerial.print("WCUP"); 
+}
+
+//Envoie le besoin de reprendre le gobelet 
+void Communication::sendRetireCup() {
+  BTSerial.print("RCUP"); 
+}
+
+//Envoie la non comprehension de la commande
+void Communication::sendUnknown() {
+  BTSerial.print("UKWN"); 
 }
