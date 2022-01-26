@@ -1,11 +1,11 @@
 #ifndef DISTRIBUTOR_H
 #define DISTRIBUTOR_H
 
-#include "./SoundNotification.h"
-#include "./CupSensor.h"
-#include "./Pump.h"
-#include "./Cocktail.h"
-#include "./Arduino.h"
+#include "SoundNotification.h"
+#include "CupSensor.h"
+#include "Pump.h"
+#include "Cocktail.h"
+#include <Arduino.h>
 
 /// <summary>
 /// Classe principale du distributeur de cocktails.
@@ -20,13 +20,13 @@ private:
 	SoundNotification _soundNotifier;
 
 	/// <summary>
-	/// Module de vérification des dosages.
+	/// Module de vï¿½rification des dosages.
 	/// </summary>
 	/// <returns></returns>
 	CupSensor _cupSensor;
 
 	/// <summary>
-	/// Pompes installées sur le distributeur.
+	/// Pompes installï¿½es sur le distributeur.
 	/// </summary>
 	Pump _pumps[10];
 
@@ -43,38 +43,38 @@ private:
 	 Distributor();
 
 	 /// <summary>
-	 /// Démarre le service du distributeur.
+	 /// Dï¿½marre le service du distributeur.
 	 /// </summary>
 	 void beginService();
 
 	 /// <summary>
-	 /// Ajoute un liquide à l'emplacement spécifié.
+	 /// Ajoute un liquide ï¿½ l'emplacement spï¿½cifiï¿½.
 	 /// </summary>
-	 /// <param name="liquid">Liquide à ajouter.</param>
+	 /// <param name="liquid">Liquide ï¿½ ajouter.</param>
 	 /// <param name="pumpID">Pompe de destination.</param>
-	 /// <return>Un booléen qui vaut <b>true</b> si le liquide a pu être ajouté, <b>false</b> sinon.</return>
+	 /// <return>Un boolï¿½en qui vaut <b>true</b> si le liquide a pu ï¿½tre ajoutï¿½, <b>false</b> sinon.</return>
 	 void addLiquid(Liquid liquid, int pumpID);
 
 	 /// <summary>
-	 /// Sert le cocktail demandé.
+	 /// Sert le cocktail demandï¿½.
 	 /// </summary>
-	 /// <param name="cocktail">Cocktail demandé.</param>
+	 /// <param name="cocktail">Cocktail demandï¿½.</param>
 	 void serveCocktail(Cocktail cocktail);
 
 	 /// <summary>
 	 /// Attend qu'un gobelet soit pose.
 	 /// </summary>
-	 /// <return>Un booléen qui vaut <b>true</b> si le gobelet a été posé, <b>false</b> si l'utilisateur n'a pas pose pas son gobelet avant le délai imparti.</return>
+	 /// <return>Un boolï¿½en qui vaut <b>true</b> si le gobelet a ï¿½tï¿½ posï¿½, <b>false</b> si l'utilisateur n'a pas pose pas son gobelet avant le dï¿½lai imparti.</return>
 	 bool waitForCup();
 
 	 /// <summary>
-	 /// Récupère les informations liées à la pompe demandée.
+	 /// Rï¿½cupï¿½re les informations liï¿½es ï¿½ la pompe demandï¿½e.
 	 /// </summary>
-	 /// <param name="pumpID">Numéro de la pompe.</param>
+	 /// <param name="pumpID">Numï¿½ro de la pompe.</param>
 	 void getPump(int pumpID);
 
 	 /// <summary>
-	 /// Récupère la configuration du distributeur.
+	 /// Rï¿½cupï¿½re la configuration du distributeur.
 	 /// </summary>
 	 void getConfiguration();
 
@@ -85,4 +85,3 @@ private:
 };
 
 #endif
-

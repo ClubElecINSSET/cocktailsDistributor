@@ -1,6 +1,6 @@
-#include "./Cocktail.h"
-#include "./CupSensor.h"
-#include "./Liquid.h"
+#include "Cocktail.h"
+#include "CupSensor.h"
+#include "Liquid.h"
 
 Cocktail::Cocktail() {
 

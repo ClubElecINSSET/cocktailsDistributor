@@ -1,6 +1,6 @@
-#include "./Pump.h"
-#include "./Liquid.h"
-#include "./Arduino.h"
+#include "Pump.h"
+#include "Liquid.h"
+#include <Arduino.h>
 
 Pump::Pump() {
 
