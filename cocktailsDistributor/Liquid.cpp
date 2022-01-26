@@ -1,4 +1,4 @@
-#include "./Liquid.h"
+#include "Liquid.h"
 
 Liquid::Liquid() {
 

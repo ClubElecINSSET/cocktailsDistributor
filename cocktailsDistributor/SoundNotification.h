@@ -1,8 +1,8 @@
 #ifndef SOUNDNOTIFICATION_H
 #define SOUNDNOTIFICATION_H
 
-#include "./DFRobotDFPlayerMini.h"
-#include "./SoftwareSerial.h"
+#include <DFRobotDFPlayerMini.h>
+#include <SoftwareSerial.h>
 
 #define WAITING_FOR_CUP 1
 #define START_POURING 2
@@ -32,7 +32,7 @@ private:
     /// </summary>
     int _busyPin;
 
-    //Liaison série utilisée pour le module
+    //Liaison sï¿½rie utilisï¿½e pour le module
 
     /// <summary>
     /// Module DFPlayer.

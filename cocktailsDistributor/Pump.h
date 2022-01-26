@@ -1,7 +1,7 @@
 #ifndef PUMP_H
 #define PUMP_H
 
-#include "./Liquid.h"
+#include "Liquid.h"
 
 /// <summary>
 /// Classe Pump, organe de pompage des liquides.
@@ -20,7 +20,7 @@ private:
     bool _activated = false;
 
     /// <summary>
-    /// Liquide associé à la pompe.
+    /// Liquide associï¿½ ï¿½ la pompe.
     /// </summary>
     Liquid _liquid;
 
@@ -59,15 +59,15 @@ public:
     bool isActive();
 
     /// <summary>
-    /// Récupère le liquide associé à la pompe.
+    /// Rï¿½cupï¿½re le liquide associï¿½ ï¿½ la pompe.
     /// </summary>
-    /// <returns>Une référence au liquide associé à la pompe.</returns>
+    /// <returns>Une rï¿½fï¿½rence au liquide associï¿½ ï¿½ la pompe.</returns>
     Liquid* getLiquid();
 
     /// <summary>
-    /// Paramètre le liquide associé à la pompe.
+    /// Paramï¿½tre le liquide associï¿½ ï¿½ la pompe.
     /// </summary>
-    /// <param name="liquid">Le liquide à associer à la pompe.</param>
+    /// <param name="liquid">Le liquide ï¿½ associer ï¿½ la pompe.</param>
     void setLiquid(Liquid liquid);
 };
 

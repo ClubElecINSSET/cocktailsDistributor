@@ -1,9 +1,9 @@
 #ifndef COCKTAIL_H
 #define COCKTAIL_H
 
-#include "./Liquid.h"
-#include "./CupSensor.h"
-#include "./SoundNotification.h"
+#include "Liquid.h"
+#include "CupSensor.h"
+#include "SoundNotification.h"
 
 /// <summary>
 /// Classe Cocktail, element que demande l'utilisateur.
@@ -11,7 +11,7 @@
 class Cocktail {
 private:
     /// <summary>
-    /// Instructions de dosage (pompeID et quantité) du cocktail.
+    /// Instructions de dosage (pompeID et quantitï¿½) du cocktail.
     /// </summary>
     int _instructions[10][2] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 public:

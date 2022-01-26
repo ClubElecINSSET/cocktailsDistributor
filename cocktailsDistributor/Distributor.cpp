@@ -1,15 +1,15 @@
-#include "./Distributor.h"
-#include "./Configuration.h"
-#include "./SoundNotification.h"
-#include "./CupSensor.h"
-#include "./Pump.h"
-#include "./Cocktail.h"
-#include "./Liquid.h"
-#include "./Arduino.h"
-#include "./SoftwareSerial.h"
+#include "Distributor.h"
+#include "Configuration.h"
+#include "SoundNotification.h"
+#include "CupSensor.h"
+#include "Pump.h"
+#include "Cocktail.h"
+#include "Liquid.h"
+#include <Arduino.h>
+#include <SoftwareSerial.h>
 
 Distributor::Distributor() {
-	//Définition des pompes
+	//Dï¿½finition des pompes
 	_pumps[0] = Pump(53);
 	_pumps[1] = Pump(52);
 	_pumps[2] = Pump(51);
@@ -31,26 +31,26 @@ Distributor::Distributor() {
 	_pumps[7].init();
 	_pumps[8].init();
 	_pumps[9].init();
-	//Création du service de communication
+	//Crï¿½ation du service de communication
 	// TODO: Construire un objet Communication et l'initialiser avec une instance de distributeur
-	//Création du service de notification
+	//Crï¿½ation du service de notification
 	_soundNotifier = SoundNotification(17, 16, 6);
 	_soundNotifier.init();
-	//Création du service de vérification des dosages
+	//Crï¿½ation du service de vï¿½rification des dosages
 	_cupSensor = CupSensor(14, 15, -219);
 	_cupSensor.init();
 }
 
 void Distributor::addLiquid(Liquid liquid, int pumpID) {
-	// TODO: Vérification du numéro de pompe, si incorrect envoyer ERR
+	// TODO: Vï¿½rification du numï¿½ro de pompe, si incorrect envoyer ERR
 	//if (pumpID < 0 || pumpID > sizeof(_pumps) - 1)
 	_pumps[pumpID].setLiquid(liquid);
 }
 
 void Distributor::beginService() {
-	// TODO: Démarrer l'écoute de la communication bluetooth en parallèle
+	// TODO: Dï¿½marrer l'ï¿½coute de la communication bluetooth en parallï¿½le
 
-	//DEBUG - Création d'un cocktail sans communication
+	//DEBUG - Crï¿½ation d'un cocktail sans communication
 	while (true) {
 		Liquid water = Liquid(1, 1500);
 		_pumps[0].setLiquid(water);
@@ -64,7 +64,7 @@ void Distributor::beginService() {
 
 bool Distributor::waitForCup() {
 	int cupTimeout = millis() + Configuration::CUP_WAITING_TIMEOUT;
-	//On attend qu'un gobelet soit posé
+	//On attend qu'un gobelet soit posï¿½
 	while (!_cupSensor.isCupAvailable()) {
 		if (millis() >= cupTimeout) return false;
 		else if (_cupSensor.isCupRemoved()) {
@@ -75,22 +75,22 @@ bool Distributor::waitForCup() {
 }
 
 void Distributor::serveCocktail(Cocktail cocktail) {
-	//On vérifie les quantités
+	//On vï¿½rifie les quantitï¿½s
 	Serial.println("I'm here (2) !");
 	if (checkQuantities(&cocktail)) {
 		//On attend qu'un gobelet soit disponible sur la plateforme
 		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(WAITING_FOR_CUP);
 		if (waitForCup()) {
-			//Stock suffisant - on crée le cocktail
+			//Stock suffisant - on crï¿½e le cocktail
 			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(START_POURING);
-			//On exécute les instructions du cocktail les unes après les autres
+			//On exï¿½cute les instructions du cocktail les unes aprï¿½s les autres
 			for (int i = 0; i < Configuration::MAX_COCKTAIL_INSTRUCTIONS; i++) {
 				int pumpID = cocktail.getPumpID(i);
 				int amount = cocktail.getAmount(i);
 				if (amount != -1) {
 					int amountPoured = 0;
 					if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifyASync(STEP_POURING);
-					//Remise à zéro du capteur de gobelet
+					//Remise ï¿½ zï¿½ro du capteur de gobelet
 					_cupSensor.tare();
 					//Versement du liquide
 					bool active = true;
@@ -98,13 +98,13 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 					float volumicMass = _pumps[pumpID].getLiquid()->getVolumicMass();
 					while (active) {
 						int measure = _cupSensor.measureLevel();
-						//Tant que le niveau exigé n'est pas atteint, on verse le liquide
+						//Tant que le niveau exigï¿½ n'est pas atteint, on verse le liquide
 						if (measure < (amount - Configuration::OVERPOURING_AMOUNT) * volumicMass) {
-							//Si le gobelet est retiré, on engage une anomalie
+							//Si le gobelet est retirï¿½, on engage une anomalie
 							if (!_cupSensor.isCupRemoved()) {
 								int lastPoured = measure * volumicMass;
 								_pumps[pumpID].activatePump();
-								//Si la quantité mesurée est inférieure à la quantité mesurée juste avant, on engage une anomalie
+								//Si la quantitï¿½ mesurï¿½e est infï¿½rieure ï¿½ la quantitï¿½ mesurï¿½e juste avant, on engage une anomalie
 								if (lastPoured < amountPoured - Configuration::TOLERATED_REGRESSION_MARGIN) {
 									amountPoured += lastPoured;
 									active = false;
@@ -123,11 +123,11 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 						}
 						else active = false;
 					}
-					//Instruction terminée, désactivation de la pompe
+					//Instruction terminï¿½e, dï¿½sactivation de la pompe
 					_pumps[pumpID].deactivatePump();
-					//Décrémentation de la quantité de liquide versée
+					//Dï¿½crï¿½mentation de la quantitï¿½ de liquide versï¿½e
 					_pumps[pumpID].getLiquid()->decreaseAmount(amountPoured + Configuration::OVERPOURING_AMOUNT);
-					//Si une anomalie a été engagée, on invite l'utilisateur à retirer son gobelet et on met fin au cocktail
+					//Si une anomalie a ï¿½tï¿½ engagï¿½e, on invite l'utilisateur ï¿½ retirer son gobelet et on met fin au cocktail
 					if (anomaly) {
 						// TODO: Envoi d'un message ANOM
 						if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(CUP_IS_REMOVED);
@@ -143,11 +143,11 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 
 bool Distributor::checkQuantities(Cocktail* cocktail) {
 	bool satisfied[10] = { true, true, true, true, true, true, true, true, true, true };
-	//Réinitialise le test pour chaque liquide
+	//Rï¿½initialise le test pour chaque liquide
 	for (int i = 0; i < 10; i++) {
 		_pumps[i].getLiquid()->resetTest();
 	}
-	//Réalise le test pour chaque instruction du cocktail
+	//Rï¿½alise le test pour chaque instruction du cocktail
 	for (int i = 0; i < Configuration::MAX_COCKTAIL_INSTRUCTIONS; i++) {
 		int amount = cocktail->getAmount(i);
 		if (amount != -1) {
@@ -155,7 +155,7 @@ bool Distributor::checkQuantities(Cocktail* cocktail) {
 			if (!_pumps[pumpId].getLiquid()->testAvailable(amount)) satisfied[pumpId] = false;
 		}
 	}
-	//Vérification des instructions non-satisfaites
+	//Vï¿½rification des instructions non-satisfaites
 	for (int i = 0; i < 10; i++) {
 		if (!satisfied[i]) {
 			// TODO: Envoi d'un message NEED(satisfied)
@@ -166,11 +166,11 @@ bool Distributor::checkQuantities(Cocktail* cocktail) {
 }
 
 void Distributor::getPump(int pumpID) {
-	// TODO: Envoyer un message de statut contenant le nom du liquide, sa masse volumique et sa quantité restante
+	// TODO: Envoyer un message de statut contenant le nom du liquide, sa masse volumique et sa quantitï¿½ restante
 }
 
 void Distributor::getConfiguration() {
-	// TODO: Envoyer un message contenant les disponibilités pour chaque liquide
+	// TODO: Envoyer un message contenant les disponibilitï¿½s pour chaque liquide
 }
 
 void Distributor::emergencyStop() {

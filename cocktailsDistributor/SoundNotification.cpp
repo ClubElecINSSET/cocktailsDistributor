@@ -1,9 +1,9 @@
-#include "./SoundNotification.h"
+#include "SoundNotification.h"
 
-#include "./Configuration.h"
-#include "./DFRobotDFPlayerMini.h"
-#include "./SoftwareSerial.h"
-#include "./Arduino.h"
+#include "Configuration.h"
+#include <DFRobotDFPlayerMini.h>
+#include <SoftwareSerial.h>
+#include <Arduino.h>
 
 SoundNotification::SoundNotification() {
 
