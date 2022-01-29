@@ -21,11 +21,8 @@ class Communication {
     Command command;
     //BTSerial
     SoftwareSerial BTSerial = SoftwareSerial(8, 9);
-    //Reference Distributor
-    //*Distributor distributor
 
-    //Lecture, nettoyage et récuperation des commandes
-    void readSerialPort();
+    //Nettoyage et récuperation des commandes
     void cleanMessage();
     void identification();
     void parametersTreatment();
@@ -34,8 +31,11 @@ class Communication {
 
   public:
     Communication();
+
     Communication(int pinRx_, int pinTx_);
-    //Communication(int pinRx_, int pinTx_, *Distributor distributor_);
+
+    void readSerialPort();
+
     void setupCommunicationModule();
     
     void setMessage(String message_);

@@ -5,6 +5,7 @@
 #include "Pump.h"
 #include "Cocktail.h"
 #include "Liquid.h"
+#include "Command.h"
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
@@ -32,7 +33,11 @@ Distributor::Distributor() {
 	_pumps[8].init();
 	_pumps[9].init();
 	//Cr�ation du service de communication
-	// TODO: Construire un objet Communication et l'initialiser avec une instance de distributeur
+	_communication = Communication(8, 9);
+	_communication.setupCommunicationModule();
+
+	// TODO : Associer l'interruption sur la broche RX du module HC-05 et démarrer la routine receivingCommand() sur front montant
+	
 	//Cr�ation du service de notification
 	_soundNotifier = SoundNotification(17, 16, 6);
 	_soundNotifier.init();
@@ -47,24 +52,51 @@ void Distributor::addLiquid(Liquid liquid, int pumpID) {
 	_pumps[pumpID].setLiquid(liquid);
 }
 
-void Distributor::beginService() {
-	// TODO: D�marrer l'�coute de la communication bluetooth en parall�le
+void Distributor::receivingCommand() {
+	_communication.readSerialPort();
+	executeCommand();
+}
 
-	//DEBUG - Cr�ation d'un cocktail sans communication
-	while (true) {
-		Liquid water = Liquid(1, 1500);
-		_pumps[0].setLiquid(water);
+void Distributor::executeCommand() {
+	Command command = _communication.getCommand();
+	String name = command.getName();
+	if (name == "LIQU") {
+		//Ajout d'un nouveau liquide
+		float volumicMass = command.getParameter(0).toFloat();
+		int available = command.getParameter(1).toInt();
+		int pumpID = command.getParameter(2).toInt();
+		addLiquid(Liquid(volumicMass, available), pumpID);
+	}
+	else if (name == "COCK") {
+		//Demande d'un cocktail
 		Cocktail cocktail;
-		cocktail.addInstruction(0, 0, 20);
-		cocktail.addInstruction(1, 0, 20);
-		Serial.println("I'm here (1) !");
+		for (int i = 0; i < 10; i++) {
+			cocktail.addInstruction(i, 0, 20); // TODO: Modifier pour ajouter les instructions reçues : 10 paramètres, pas 20 ?
+		}
 		serveCocktail(cocktail);
+	}
+	else if (name == "SLOT") {
+		//Récupération de l'état d'un emplacement
+		int pumpID = command.getParameter(0).toInt();
+		getPumpInformation(pumpID);
+	}
+	else if (name == "CONF") {
+		//Récupération de la configuration du distributeur
+		getConfiguration();
+	}
+	else if (name = "STOP") {
+		//Arrêt du distributeur
+		emergencyStop();
+	}
+	else {
+		//Aucune commande reconnue
+		//communication.sendStatus(STATUS_UKWN);
 	}
 }
 
 bool Distributor::waitForCup() {
 	int cupTimeout = millis() + Configuration::CUP_WAITING_TIMEOUT;
-	//On attend qu'un gobelet soit pos�
+	//On attend qu'un gobelet soit pose
 	while (!_cupSensor.isCupAvailable()) {
 		if (millis() >= cupTimeout) return false;
 		else if (_cupSensor.isCupRemoved()) {
@@ -76,7 +108,6 @@ bool Distributor::waitForCup() {
 
 void Distributor::serveCocktail(Cocktail cocktail) {
 	//On v�rifie les quantit�s
-	Serial.println("I'm here (2) !");
 	if (checkQuantities(&cocktail)) {
 		//On attend qu'un gobelet soit disponible sur la plateforme
 		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(WAITING_FOR_CUP);
@@ -142,37 +173,44 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 }
 
 bool Distributor::checkQuantities(Cocktail* cocktail) {
-	bool satisfied[10] = { true, true, true, true, true, true, true, true, true, true };
-	//R�initialise le test pour chaque liquide
+	bool satisfied[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	//Reinitialise le test pour chaque liquide
 	for (int i = 0; i < 10; i++) {
 		_pumps[i].getLiquid()->resetTest();
 	}
-	//R�alise le test pour chaque instruction du cocktail
+	//Realise le test pour chaque instruction du cocktail
 	for (int i = 0; i < Configuration::MAX_COCKTAIL_INSTRUCTIONS; i++) {
 		int amount = cocktail->getAmount(i);
 		if (amount != -1) {
 			int pumpId = cocktail->getPumpID(i);
-			if (!_pumps[pumpId].getLiquid()->testAvailable(amount)) satisfied[pumpId] = false;
+			if (!_pumps[pumpId].getLiquid()->testAvailable(amount)) satisfied[pumpId] = 0;
 		}
 	}
-	//V�rification des instructions non-satisfaites
+	//Si au moins une instruction est insatisfaite, on envoie une commande de réapprovisionnement
 	for (int i = 0; i < 10; i++) {
 		if (!satisfied[i]) {
-			// TODO: Envoi d'un message NEED(satisfied)
+			// TODO: communication.sendNeed(satisfied);
 			return false;
 		}
 	}
 	return true;
 }
 
-void Distributor::getPump(int pumpID) {
+void Distributor::getPumpInformation(int pumpID) {
 	// TODO: Envoyer un message de statut contenant le nom du liquide, sa masse volumique et sa quantit� restante
+	//communication.sendSlot(_pumps[pumpID].getLiquid()->getAvailable());
 }
 
 void Distributor::getConfiguration() {
 	// TODO: Envoyer un message contenant les disponibilit�s pour chaque liquide
+	int conf[10];
+	for (int i = 0; i < 10; i++) {
+		conf[i] = _pumps[i].getLiquid()->getAvailable();
+	}
+	//communication.sendConfiguration(conf);
 }
 
 void Distributor::emergencyStop() {
 	// TODO: Stopper toutes les actions du distributeur
+	//communication.sendStatus(STATUS_OK);
 }
