@@ -5,6 +5,7 @@
 #include "CupSensor.h"
 #include "Pump.h"
 #include "Cocktail.h"
+#include "Communication.h"
 #include <Arduino.h>
 
 /// <summary>
@@ -31,6 +32,11 @@ private:
 	Pump _pumps[10];
 
 	/// <summary>
+	/// Gestion des commandes entrantes/sortantes 
+	/// </summary>
+	Communication _communication;
+
+	/// <summary>
 	 /// Verification des quantites de chaque instruction du cocktail.
 	 /// </summary>
 	 /// <returns>Un booleen qui vaut <b>true</b> si le cocktail peut etre realise, <b>false</b> sinon.</returns>
@@ -43,9 +49,14 @@ private:
 	 Distributor();
 
 	 /// <summary>
-	 /// D�marre le service du distributeur.
+	 /// Attend qu'une commande soit reçue par bluetooth.
 	 /// </summary>
-	 void beginService();
+	 void receivingCommand();
+
+	 /// <summary>
+	 /// Execute la commande reçue.
+	 /// </summary>
+	 void executeCommand();
 
 	 /// <summary>
 	 /// Ajoute un liquide � l'emplacement sp�cifi�.
@@ -71,7 +82,7 @@ private:
 	 /// R�cup�re les informations li�es � la pompe demand�e.
 	 /// </summary>
 	 /// <param name="pumpID">Num�ro de la pompe.</param>
-	 void getPump(int pumpID);
+	 void getPumpInformation(int pumpID);
 
 	 /// <summary>
 	 /// R�cup�re la configuration du distributeur.

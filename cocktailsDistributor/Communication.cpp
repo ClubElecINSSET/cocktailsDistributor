@@ -13,14 +13,6 @@ Communication::Communication(int pinRx_, int pinTx_) {
   pinTx = pinTx_;
 }
 
-/*
-Communication::Communication(int pinRx_, int pinTx_, *Distributor distributor_) {
-  pinRx = pinRx_;
-  pinTx = pinTx_;
-  distributor = distributor_;
-}
-*/
-
 //Initialise le module de notification sonore
 void Communication::setupCommunicationModule(){
   BTSerial = SoftwareSerial(pinRx, pinTx);

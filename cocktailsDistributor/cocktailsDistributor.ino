@@ -32,5 +32,5 @@ void setup() {
 /// Loops this instance.
 /// </summary>
 void loop() {
-	_distributor.beginService();
+
 }
