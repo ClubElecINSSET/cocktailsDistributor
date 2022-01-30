@@ -9,8 +9,12 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+Distributor* Distributor::_distributor = NULL;
+
 Distributor::Distributor() {
-	//D�finition des pompes
+	//Marquage de l'objet en cours
+	Distributor::_distributor = this;
+	//Definition des pompes
 	_pumps[0] = Pump(53);
 	_pumps[1] = Pump(52);
 	_pumps[2] = Pump(51);
@@ -32,28 +36,30 @@ Distributor::Distributor() {
 	_pumps[7].init();
 	_pumps[8].init();
 	_pumps[9].init();
-	//Cr�ation du service de communication
-	_communication = Communication(8, 9);
-	_communication.setupCommunicationModule();
-
-	// TODO : Associer l'interruption sur la broche RX du module HC-05 et démarrer la routine receivingCommand() sur front montant
-	
-	//Cr�ation du service de notification
+	//Creation du service de communication
+	_communication = Communication();
+	//Parametrage d'une interruption sur le broche de reception des commandes (front montant)
+	attachInterrupt(digitalPinToInterrupt(19), Distributor::handleCommand, RISING);
+	//Creation du service de notification
 	_soundNotifier = SoundNotification(17, 16, 6);
 	_soundNotifier.init();
-	//Cr�ation du service de v�rification des dosages
+	//Creation du service de verification des dosages
 	_cupSensor = CupSensor(14, 15, -219);
 	_cupSensor.init();
 }
 
+void Distributor::handleCommand() {
+	Distributor::_distributor->receivingCommand();
+}
+
 void Distributor::addLiquid(Liquid liquid, int pumpID) {
 	// TODO: V�rification du num�ro de pompe, si incorrect envoyer ERR
-	//if (pumpID < 0 || pumpID > sizeof(_pumps) - 1)
+	//if (pumpID < 0 || pumpID > sizeof(_pumps) - 1) _communication.sendStatus(STATUS_ERROR);
 	_pumps[pumpID].setLiquid(liquid);
 }
 
 void Distributor::receivingCommand() {
-	_communication.readSerialPort();
+	_communication.createCommand();
 	executeCommand();
 }
 
