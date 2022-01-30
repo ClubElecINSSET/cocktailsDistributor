@@ -16,6 +16,16 @@ class Distributor
 
 private:
 	/// <summary>
+	/// Objet distributeur en cours d'utilisation
+	/// </summary>
+	static Distributor* _distributor;
+
+	/// <summary>
+	/// Routine d'interruption appelée lors de la réception d'une commande
+	/// </summary>
+	static void handleCommand();
+
+	/// <summary>
 	/// Module de notification sonore.
 	/// </summary>
 	SoundNotification _soundNotifier;

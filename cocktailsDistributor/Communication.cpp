@@ -5,18 +5,7 @@
 
 //Crée une communcation
 Communication::Communication() {
-  
-}
-
-Communication::Communication(int pinRx_, int pinTx_) {
-  pinRx = pinRx_;
-  pinTx = pinTx_;
-}
-
-//Initialise le module de notification sonore
-void Communication::setupCommunicationModule(){
-  BTSerial = SoftwareSerial(pinRx, pinTx);
-  BTSerial.begin(38400);
+  Serial1.begin(38400);
 }
 
 //--------------------------------------------------------------------
@@ -60,9 +49,9 @@ void Communication::createCommand() {
 //lis les données recu par le port serie
 void Communication::readSerialPort() {
   message="";
-  while (Serial.available()) {
-    if (Serial.available() >0) {
-      char c = Serial.read();  //gets one byte from serial buffer
+  while (Serial1.available()) {
+    if (Serial1.available() >0) {
+      char c = Serial1.read();  //gets one byte from serial buffer
       message += c; //makes the string readString
     }
   }

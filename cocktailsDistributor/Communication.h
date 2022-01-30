@@ -19,8 +19,6 @@ class Communication {
     String parameters;
     //Commande récupéré
     Command command;
-    //BTSerial
-    SoftwareSerial BTSerial = SoftwareSerial(8, 9);
 
     //Nettoyage et récuperation des commandes
     void cleanMessage();
@@ -32,11 +30,7 @@ class Communication {
   public:
     Communication();
 
-    Communication(int pinRx_, int pinTx_);
-
     void readSerialPort();
-
-    void setupCommunicationModule();
     
     void setMessage(String message_);
     String getMessage();
