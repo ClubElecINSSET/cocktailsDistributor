@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include "Distributor.h"
 
-Distributor _distributor;
+//Distributor _distributor;
 
 /// <summary>
 /// Initialisation du distributeur.
@@ -23,9 +23,7 @@ void setup() {
     Configuration::TOLERATED_REGRESSION_MARGIN = 10; //Marge de r�gression tol�r�e lors du versement d'un liquide
 	Configuration::SOUND_VOLUME = 25; //Volume des annonces sonores (0-30)
 	Configuration::CUP_WAITING_TIMEOUT = 10000; //D�lai imparti pour poser le gobelet avant l'annulation du cocktail (en ms)
-
-	//Initialisation du port s�rie
-	Serial.begin(115200);
+	Distributor distributor = Distributor();
 }
 
 /// <summary>
