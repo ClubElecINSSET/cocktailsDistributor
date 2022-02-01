@@ -15,4 +15,4 @@ Nom | Description | Version | Auteur
 [HX711 Arduino Library](https://www.arduino.cc/reference/en/libraries/hx711-arduino-library/) | Driver pour module d'acquisition HX711 | **0.7.5** | Bogdan Necula
 [DFRobotDFPlayerMini](https://www.arduino.cc/reference/en/libraries/dfrobotdfplayermini/) | Driver pour module DFPlayer | **1.0.5** | Angelo
 
-D'autres bibliothèques comme `Arduino`, `SoftwareSerial` et `WString` sont utilisées et **incluses de base** lors de l'installation de l'IDE Arduino.
+D'autres bibliothèques comme `Arduino` et `WString` sont utilisées et **incluses de base** lors de l'installation de l'IDE Arduino.
