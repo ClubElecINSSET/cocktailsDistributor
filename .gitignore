@@ -1,6 +1,7 @@
 .vs/
 cocktailsDistributor/__vm/
 cocktailsDistributor/Debug/
+cocktailsDistributor/Release/
 cocktailsDistributorConfig
 cocktailsDistributor/cocktailsDistributor.vcxproj
 documentation/

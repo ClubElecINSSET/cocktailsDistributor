@@ -2,7 +2,6 @@
 #define COMMUNICATION_H
 
 #include <WString.h>
-#include <SoftwareSerial.h>
 #include "Command.h"
 
 class Communication {

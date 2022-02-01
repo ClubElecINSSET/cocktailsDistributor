@@ -2,7 +2,6 @@
 #define SOUNDNOTIFICATION_H
 
 #include <DFRobotDFPlayerMini.h>
-#include <SoftwareSerial.h>
 
 #define WAITING_FOR_CUP 1
 #define START_POURING 2
@@ -17,16 +16,6 @@
 /// </summary>
 class SoundNotification {
 private:
-    /// <summary>
-    /// Pin RX du module DFPlayer.
-    /// </summary>
-    int _rxPin;
-
-    /// <summary>
-    /// Pin TX du module DFPlayer.
-    /// </summary>
-    int _txPin;
-
     /// <summary>
     /// Pin BUSY du module DFPlayer.
     /// </summary>
@@ -51,12 +40,12 @@ public:
     /// <param name="rxModulePin">Le pin RX du module DFPlayer.</param>
     /// <param name="txModulePin">Le pin TX du module DFPlayer.</param>
     /// <param name="busyModulePin">Le pin BUSY du module DFPlayer.</param>
-    SoundNotification(int rxPin, int txPin, int busyPin);
+    SoundNotification(int busyPin);
 
     /// <summary>
     /// Initialise une SoundNotification.
     /// </summary>
-    void init();
+    bool init();
 
     /// <summary>
     /// Notifie l'utilisateur, attend la fin de la notification pour continuer.
