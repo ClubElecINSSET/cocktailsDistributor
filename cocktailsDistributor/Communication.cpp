@@ -1,6 +1,5 @@
 #include "Communication.h"
 #include <WString.h>
-#include <SoftwareSerial.h>
 #include <Arduino.h>
 
 //Crée une communcation

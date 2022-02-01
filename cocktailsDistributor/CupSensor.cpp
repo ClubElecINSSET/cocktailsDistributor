@@ -1,5 +1,4 @@
 #include <HX711.h>
-
 #include "CupSensor.h"
 #include <Arduino.h>
 
