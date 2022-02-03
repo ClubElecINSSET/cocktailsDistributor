@@ -7,3 +7,4 @@ cocktailsDistributor/cocktailsDistributor.vcxproj
 documentation/
 *.user
 *.filters
+.DS_Store
