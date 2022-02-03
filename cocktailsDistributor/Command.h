@@ -14,11 +14,8 @@ class Command {
     Command(String CommandName);
     void setName(String name_);
     void setParameter(String parameter, int id);
-    void deleteParameter(int id);
-    void clearParameters();
     String getName();
     String getParameter(int id);
-    //String[11] getParameterArray();
 };
 
 #endif

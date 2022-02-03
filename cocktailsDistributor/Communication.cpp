@@ -7,39 +7,30 @@ Communication::Communication() {
   Serial1.begin(38400);
 }
 
-//--------------------------------------------------------------------
-//                          Generisation class
-//--------------------------------------------------------------------
+//-----------------------------------------------------------------------
+//                    IHM --> Distributeur
+//-----------------------------------------------------------------------
 
-//Message
-void Communication::setMessage(String message_) {
-  message = message_;
-}
+    //--------------------------------------------------
+    //                   Creation Command
+    //--------------------------------------------------
 
-String Communication::getMessage() {
-  return message;
-}
-
-
-//Commande
-void Communication::setCommand(Command command_) {
-  command = command_;
-}
-
-Command Communication::getCommand() {
-  return command;
-}  
-
+//Crée la commande correspondante au message reçu
 void Communication::createCommand() {
-  readSerialPort();
+  command = Command();
   if(message != "") {
-    command = Command();
     cleanMessage();
     identification();
     parametersTreatment();
   }
 }
 
+//Permet de lire, crée et renvoyer la commande
+Command Communication::captureCommand() {
+  readSerialPort();
+  createCommand();
+  return command;
+}
 
 //--------------------------------------------------------------------
 //                          Recup Command
@@ -80,17 +71,17 @@ void Communication::parametersTreatment() {
   //Delimite les parties a diviser --> chaque parametre (entre 0 et la premiere virgule)
   int paraDelimiter = parameters.indexOf(",");
   int id = 0;
-   String parameterN;
+  String parameterN;
 
   //Continue tant que le message n'est pas vide
   while(parameters.length() != 0) {
-    paraDelimiter = this->defineParaDelimiter(paraDelimiter);
+    paraDelimiter = defineParaDelimiter(paraDelimiter);
     
     //On récupere le parametre et on le place dans un tableau
     parameterN = parameters.substring(0, paraDelimiter);
 
     //Nettoye le parametre
-    parameterN = this->cleanParameter(parameterN);
+    parameterN = cleanParameter(parameterN);
 
     //Stocke le parametre
     command.setParameter(parameterN, id);
@@ -124,4 +115,44 @@ String Communication::cleanParameter(String parameter) {
     parameter.remove(parameter.length()-1, parameter.length());
   }
   return parameter;
+}
+
+  //-----------------------------------------------------------------------
+  //                    Distributeur --> IHM
+  //-----------------------------------------------------------------------
+
+  void Communication::sendStatus(String status_) {
+    BTSerial.println(status_);
+  }
+
+//Envoie un besoin de réaprovisionnement
+void Communication::sendNeed(int slots[10]) {
+  String response = "NEED(";
+  for (int i = 0; i<9; i++) {
+    response += String(slots[i]) + ",";
+  }
+  response += String(slots[9])+")";
+  BTSerial.print(response); 
+}
+
+//Envoie l'etape et le pourcentage accomplie d'une tache
+void Communication::sendProgress(int step_, int progress) {
+  String response = String("POUR(") + step_ + "," + progress + ")";
+  BTSerial.print(response);
+}
+
+//Envoie la quantité restante d'un liquide
+void Communication::sendSlotStatus(int available) {
+  String response = String("SLOT(") + available + ")";
+  BTSerial.print(response);
+}
+
+//Envoie la quantité restante de chaque liquide
+void Communication::sendConfiguration(int quantities[10]) {
+  String response = "CONF(";
+  for (int i = 0; i<9; i++) {
+    response += String(quantities[i]) + ",";
+  }
+  response += String(quantities[9])+")";
+  BTSerial.print(response);   
 }
