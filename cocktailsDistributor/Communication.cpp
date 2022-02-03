@@ -5,21 +5,14 @@
 
 //Crée une communcation
 Communication::Communication() {
-  
+  setupCommunicationModule();
 }
 
 Communication::Communication(int pinRx_, int pinTx_) {
   pinRx = pinRx_;
   pinTx = pinTx_;
+  setupCommunicationModule();
 }
-
-/*
-Communication::Communication(int pinRx_, int pinTx_, *Distributor distributor_) {
-  pinRx = pinRx_;
-  pinTx = pinTx_;
-  distributor = distributor_;
-}
-*/
 
 //Initialise le module de notification sonore
 void Communication::setupCommunicationModule(){
@@ -32,36 +25,24 @@ void Communication::setupCommunicationModule(){
 //-----------------------------------------------------------------------
 
     //--------------------------------------------------
-    //                   Generisation class
+    //                   Creation Command
     //--------------------------------------------------
 
-//Message
-void Communication::setMessage(String message_) {
-  message = message_;
-}
-
-String Communication::getMessage() {
-  return message;
-}
-
-
-//Commande
-void Communication::setCommand(Command command_) {
-  command = command_;
-}
-
-Command Communication::getCommand() {
-  return command;
-}  
-
+//Crée la commande correspondante au message reçu
 void Communication::createCommand() {
-  readSerialPort();
+  command = Command();
   if(message != "") {
-    command = Command();
     cleanMessage();
     identification();
     parametersTreatment();
   }
+}
+
+//Permet de lire, crée et renvoyer la commande
+Command Communication::captureCommand() {
+  readSerialPort();
+  createCommand();
+  return command;
 }
 
 
@@ -104,17 +85,17 @@ void Communication::parametersTreatment() {
   //Delimite les parties a diviser --> chaque parametre (entre 0 et la premiere virgule)
   int paraDelimiter = parameters.indexOf(",");
   int id = 0;
-   String parameterN;
+  String parameterN;
 
   //Continue tant que le message n'est pas vide
   while(parameters.length() != 0) {
-    paraDelimiter = this->defineParaDelimiter(paraDelimiter);
+    paraDelimiter = defineParaDelimiter(paraDelimiter);
     
     //On récupere le parametre et on le place dans un tableau
     parameterN = parameters.substring(0, paraDelimiter);
 
     //Nettoye le parametre
-    parameterN = this->cleanParameter(parameterN);
+    parameterN = cleanParameter(parameterN);
 
     //Stocke le parametre
     command.setParameter(parameterN, id);
@@ -155,15 +136,9 @@ String Communication::cleanParameter(String parameter) {
   //                    Distributeur --> IHM
   //-----------------------------------------------------------------------
 
-//Envoie que la tache s'est bien déroulé
- void Communication::sendSuccess() {
-  BTSerial.print("OK");
-}
-
-//Envoie qu'une erreur a été detecté
-void Communication::sendError() {
-  BTSerial.print("ERR");
-}
+  void Communication::sendStatus(String status_) {
+    BTSerial.println(status_);
+  }
 
 //Envoie un besoin de réaprovisionnement
 void Communication::sendNeed(int slots[10]) {
@@ -181,11 +156,6 @@ void Communication::sendProgress(int step_, int progress) {
   BTSerial.print(response);
 }
 
-//Envoie qu'une anomalie a été detecté
-void Communication::sendAnomaly() {
-  BTSerial.print("ANOM");
-}
-
 //Envoie la quantité restante d'un liquide
 void Communication::sendSlotStatus(int available) {
   String response = String("SLOT(") + available + ")";
@@ -200,24 +170,4 @@ void Communication::sendConfiguration(int quantities[10]) {
   }
   response += String(quantities[9])+")";
   BTSerial.print(response);   
-}
-
-//Envoie initialisation réussie
-void Communication::sendInitialized() {
-  BTSerial.print("INIT");   
-}
-
-//Evoie le Besoin de poser le gobelet
-void Communication::sendWaitForCup() {
-  BTSerial.print("WCUP"); 
-}
-
-//Envoie le besoin de reprendre le gobelet 
-void Communication::sendRetireCup() {
-  BTSerial.print("RCUP"); 
-}
-
-//Envoie la non comprehension de la commande
-void Communication::sendUnknown() {
-  BTSerial.print("UKWN"); 
 }

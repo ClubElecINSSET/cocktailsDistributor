@@ -5,15 +5,24 @@
 #include <SoftwareSerial.h>
 #include "Command.h"
 
+#define STATUS_OK "OK"
+#define STATUS_ERR "ERR"
+#define STATUS_ANOM "ANOM"
+#define STATUS_INIT "INIT"
+#define STATUS_WCUP "WCUP"
+#define STATUS_RCUP "RCUP"
+#define STATUS_UKWN "UKWN"
+#define STATUS_CAN "CAN"
+#define STATUS_END "END"
+
 class Communication {
+  
   private:
     //Pin RX du module
     int pinRx;
     //Pin TX du module
     int pinTx;
     //Pin BUSY du module
-    int busyPin;
-    //message récupéré
     String message;
     //parametres récupéré
     String parameters;
@@ -21,52 +30,42 @@ class Communication {
     Command command;
     //BTSerial
     SoftwareSerial BTSerial = SoftwareSerial(8, 9);
-    //Reference Distributor
-    //*Distributor distributor
+
+    //Setup Communication
+    void setupCommunicationModule();
 
     //Lecture, nettoyage et récuperation des commandes
     void readSerialPort();
     void cleanMessage();
     void identification();
     void parametersTreatment();
-    int defineParaDelimiter(int paraDelimiter);
-    String cleanParameter(String parameter);
+    int defineParaDelimiter(int paraDelimiter_);
+    String cleanParameter(String parameter_);
+    
+    //crée la commande
+    void createCommand();
+
 
   public:
-
     Communication();
     Communication(int pinRx_, int pinTx_);
-    //Communication(int pinRx_, int pinTx_, *Distributor distributor_);
-    void setupCommunicationModule();
 
   //-----------------------------------------------------------------------
   //                    IHM --> Distributeur
   //-----------------------------------------------------------------------
-    
-    void setMessage(String message_);
-    String getMessage();
-    
-    void setCommand(Command command_);
-    Command getCommand();
-    
-    //crée la commande complète
-    void createCommand();
+   
+    //Récupere, crée et envoie la commande;
+    Command captureCommand();
 
   //-----------------------------------------------------------------------
   //                    Distributeur --> IHM
   //-----------------------------------------------------------------------
 
-    void sendSuccess();
-    void sendError();
+    void sendStatus(String status_);
     void sendNeed(int slots[10]);
-    void sendProgress(int step, int progress);
-    void sendAnomaly();
-    void sendSlotStatus(int available);
+    void sendProgress(int step_, int progress_);
+    void sendSlotStatus(int available_);
     void sendConfiguration(int quantities[10]);
-    void sendInitialized();
-    void sendWaitForCup();
-    void sendRetireCup();
-    void sendUnknown();
 
 };
 
