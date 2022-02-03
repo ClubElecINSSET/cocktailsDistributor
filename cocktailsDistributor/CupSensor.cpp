@@ -1,7 +1,6 @@
-#include "./HX711.h"
-
-#include "./CupSensor.h"
-#include "./Arduino.h"
+#include <HX711.h>
+#include "CupSensor.h"
+#include <Arduino.h>
 
 CupSensor::CupSensor() {
 

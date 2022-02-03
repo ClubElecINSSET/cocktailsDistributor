@@ -1,8 +1,8 @@
 #ifndef CUPSENSOR_H
 #define CUPSENSOR_H
 
-#include "./HX711.h"
-#include "./Arduino.h"
+#include <HX711.h>
+#include <Arduino.h>
 
 /// <summary>
 /// Classe CupSensor, organe de verification des dosages.

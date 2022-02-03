@@ -1,28 +1,22 @@
-#include "./SoundNotification.h"
-
-#include "./Configuration.h"
-#include "./DFRobotDFPlayerMini.h"
-#include "./SoftwareSerial.h"
-#include "./Arduino.h"
+#include "SoundNotification.h"
+#include "Configuration.h"
+#include <DFRobotDFPlayerMini.h>
+#include <Arduino.h>
 
 SoundNotification::SoundNotification() {
 
 }
 
-SoundNotification::SoundNotification(int rxPin, int txPin, int busyPin) {
-    _rxPin = rxPin;
-    _txPin = txPin;
+SoundNotification::SoundNotification(int busyPin) {
     _busyPin = busyPin;
 }
 
-void SoundNotification::init() {
-    SoftwareSerial serial(_rxPin, _txPin);
-    serial.begin(9600);
+bool SoundNotification::init() {
+    Serial2.begin(9600);
     pinMode(_busyPin, INPUT);
-    if (!_player.begin(serial)) {
-        Serial.println(F("Unable to begin:"));
-    }
+    if (!_player.begin(Serial2)) return false;
     _player.volume(Configuration::SOUND_VOLUME);
+    return true;
 }
 
 void SoundNotification::notifySync(int notification) {

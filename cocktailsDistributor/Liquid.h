@@ -1,7 +1,7 @@
 #ifndef LIQUID_H
 #define LIQUID_H
 
-#include "./Arduino.h"
+#include <Arduino.h>
 
 /// <summary>
 /// Classe Liquid, element qui compose un cocktail.
@@ -58,7 +58,7 @@ public:
     /// Verifie qu'une certaine quantite de liquide est disponible dans la bouteille.
     /// </summary>
     /// <param name="amount">La quantite de liquide a verifier.</param>
-    /// <returns>Un booleen qui vaut <b>true</b> si la quantité est disponible, <b>false</b> sinon.</returns>
+    /// <returns>Un booleen qui vaut <b>true</b> si la quantitï¿½ est disponible, <b>false</b> sinon.</returns>
     bool testAvailable(int amount);
 
     /// <summary>
@@ -74,4 +74,3 @@ public:
 };
 
 #endif
-

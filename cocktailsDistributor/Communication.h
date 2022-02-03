@@ -2,7 +2,6 @@
 #define COMMUNICATION_H
 
 #include <WString.h>
-#include <SoftwareSerial.h>
 #include "Command.h"
 
 #define STATUS_OK "OK"
@@ -16,23 +15,18 @@
 #define STATUS_END "END"
 
 class Communication {
-  
+
   private:
     //Pin RX du module
     int pinRx;
     //Pin TX du module
     int pinTx;
-    //Pin BUSY du module
+    //message récupéré
     String message;
     //parametres récupéré
     String parameters;
     //Commande récupéré
     Command command;
-    //BTSerial
-    SoftwareSerial BTSerial = SoftwareSerial(8, 9);
-
-    //Setup Communication
-    void setupCommunicationModule();
 
     //Lecture, nettoyage et récuperation des commandes
     void readSerialPort();
@@ -47,8 +41,8 @@ class Communication {
 
 
   public:
-    Communication();
-    Communication(int pinRx_, int pinTx_);
+  
+  Communication();
 
   //-----------------------------------------------------------------------
   //                    IHM --> Distributeur
@@ -66,7 +60,6 @@ class Communication {
     void sendProgress(int step_, int progress_);
     void sendSlotStatus(int available_);
     void sendConfiguration(int quantities[10]);
-
 };
 
 #endif

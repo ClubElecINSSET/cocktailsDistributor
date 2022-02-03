@@ -1,23 +1,10 @@
 #include "Communication.h"
 #include <WString.h>
-#include <SoftwareSerial.h>
 #include <Arduino.h>
 
 //Crée une communcation
 Communication::Communication() {
-  setupCommunicationModule();
-}
-
-Communication::Communication(int pinRx_, int pinTx_) {
-  pinRx = pinRx_;
-  pinTx = pinTx_;
-  setupCommunicationModule();
-}
-
-//Initialise le module de notification sonore
-void Communication::setupCommunicationModule(){
-  BTSerial = SoftwareSerial(pinRx, pinTx);
-  BTSerial.begin(38400);
+  Serial1.begin(38400);
 }
 
 //-----------------------------------------------------------------------
@@ -45,7 +32,6 @@ Command Communication::captureCommand() {
   return command;
 }
 
-
 //--------------------------------------------------------------------
 //                          Recup Command
 //--------------------------------------------------------------------
@@ -53,9 +39,9 @@ Command Communication::captureCommand() {
 //lis les données recu par le port serie
 void Communication::readSerialPort() {
   message="";
-  while (BTSerial.available()) {
-    if (BTSerial.available() >0) {
-      char c = BTSerial.read();  //gets one byte from serial buffer
+  while (Serial1.available()) {
+    if (Serial1.available() >0) {
+      char c = Serial1.read();  //gets one byte from serial buffer
       message += c; //makes the string readString
     }
   }
@@ -130,7 +116,6 @@ String Communication::cleanParameter(String parameter) {
   }
   return parameter;
 }
-
 
   //-----------------------------------------------------------------------
   //                    Distributeur --> IHM
