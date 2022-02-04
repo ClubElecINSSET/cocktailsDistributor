@@ -122,7 +122,7 @@ String Communication::cleanParameter(String parameter) {
   //-----------------------------------------------------------------------
 
   void Communication::sendStatus(String status_) {
-    BTSerial.println(status_);
+    Serial1.println(status_);
   }
 
 //Envoie un besoin de réaprovisionnement
@@ -132,19 +132,19 @@ void Communication::sendNeed(int slots[10]) {
     response += String(slots[i]) + ",";
   }
   response += String(slots[9])+")";
-  BTSerial.print(response); 
+  Serial1.print(response); 
 }
 
 //Envoie l'etape et le pourcentage accomplie d'une tache
 void Communication::sendProgress(int step_, int progress) {
   String response = String("POUR(") + step_ + "," + progress + ")";
-  BTSerial.print(response);
+  Serial1.print(response);
 }
 
 //Envoie la quantité restante d'un liquide
 void Communication::sendSlotStatus(int available) {
   String response = String("SLOT(") + available + ")";
-  BTSerial.print(response);
+  Serial1.print(response);
 }
 
 //Envoie la quantité restante de chaque liquide
@@ -154,5 +154,5 @@ void Communication::sendConfiguration(int quantities[10]) {
     response += String(quantities[i]) + ",";
   }
   response += String(quantities[9])+")";
-  BTSerial.print(response);   
+  Serial1.print(response);   
 }
