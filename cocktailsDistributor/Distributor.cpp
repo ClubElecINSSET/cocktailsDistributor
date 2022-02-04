@@ -43,9 +43,8 @@ Distributor::Distributor() {
 	attachInterrupt(digitalPinToInterrupt(19), Distributor::handleCommand, RISING);
 	//Creation du service de notification
 	_soundNotifier = SoundNotification(6);
-	// TODO : Envoyer un message d'erreur si le module sonore n'est pas initialisé
-	//if (!_soundNotifier.init()) _communication.sendStatus(STATUS_ERROR);
-	if (!_soundNotifier.init()) Serial.println("ERR");
+	//Envoyer un message d'erreur si le module sonore n'est pas initialisé
+	if (!_soundNotifier.init()) _communication.sendStatus(STATUS_ERR);
 	//Creation du service de verification des dosages
 	_cupSensor = CupSensor(14, 15, -219);
 	_cupSensor.init();
@@ -62,10 +61,12 @@ void Distributor::handleCommand() {
 }
 
 void Distributor::addLiquid(Liquid liquid, int pumpID) {
-	// TODO: V�rification du num�ro de pompe, si incorrect envoyer ERR
-	//if (pumpID < 0 || pumpID > sizeof(_pumps) - 1) _communication.sendStatus(STATUS_ERROR);
-	_pumps[pumpID].setLiquid(liquid);
-	if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_ADD_LIQUID);
+	//Verification du numero de pompe, si incorrect envoyer erreur
+	if (pumpID < 0 || pumpID > sizeof(_pumps) - 1) _communication.sendStatus(STATUS_ERR);
+	else {
+		_pumps[pumpID].setLiquid(liquid);
+		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_ADD_LIQUID);
+	}
 }
 
 void Distributor::receivingCommand() {
@@ -105,7 +106,7 @@ void Distributor::executeCommand(Command command) {
 	}
 	else {
 		//Aucune commande reconnue
-		//communication.sendStatus(STATUS_UKWN);
+		_communication.sendStatus(STATUS_UKWN);
 	}
 }
 
@@ -127,6 +128,7 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 	if (checkQuantities(&cocktail)) {
 		//On attend qu'un gobelet soit disponible sur la plateforme
 		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_WAITING_CUP);
+		_communication.sendStatus(STATUS_WCUP);
 		if (waitForCup()) {
 			//Stock suffisant - on cree le cocktail
 			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_START_COCKTAIL);
@@ -160,7 +162,8 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 								else {
 									amountPoured = lastPoured;
 									int percentageCompleted = ((float)measure / (amount * volumicMass)) * 100;
-									// TODO: Envoi du statut de versement POUR(i, percentageCompleted)
+									//Envoi du statut de versement
+									_communication.sendProgress(i, percentageCompleted);
 								}
 							}
 							else {
@@ -176,25 +179,25 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 					_pumps[pumpID].getLiquid()->decreaseAmount(amountPoured + Configuration::OVERPOURING_AMOUNT);
 					//Si une anomalie a ete engagee, on invite l'utilisateur a retirer son gobelet et on met fin au cocktail
 					if (anomaly) {
-						// TODO: Envoi d'un message ANOM
-						//_communication.sendStatus(STATUS_ANOMALY);
+						_communication.sendStatus(STATUS_ANOM);
 						if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_ANOMALY);
 						break;
 					}
 				}
 			}
+			//Cocktail termine
 			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_FINISHED);
-			// TODO : Envoyer un message informant que le cocktail est terminé
-			//_communication.sendStatus(STATUS_ENDED);
+			_communication.sendStatus(STATUS_END);
 		}
+		//Cocktail annule
 		else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_CANCELED);
-		//_communication.sendStatus(STATUS_CANCELED);
+		_communication.sendStatus(STATUS_CAN);
 	}
     else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_UNAVAILABLE);
 }
 
 bool Distributor::checkQuantities(Cocktail* cocktail) {
-	bool satisfied[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+	int satisfied[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 	//Reinitialise le test pour chaque liquide
 	for (int i = 0; i < 10; i++) {
 		_pumps[i].getLiquid()->resetTest();
@@ -209,8 +212,8 @@ bool Distributor::checkQuantities(Cocktail* cocktail) {
 	}
 	//Si au moins une instruction est insatisfaite, on envoie une commande de réapprovisionnement
 	for (int i = 0; i < 10; i++) {
-		if (!satisfied[i]) {
-			// TODO: communication.sendNeed(satisfied);
+		if (satisfied[i] == 0) {
+			_communication.sendNeed(satisfied);
 			return false;
 		}
 	}
@@ -218,21 +221,21 @@ bool Distributor::checkQuantities(Cocktail* cocktail) {
 }
 
 void Distributor::getPumpInformation(int pumpID) {
-	// TODO: Envoyer un message de statut contenant le nom du liquide, sa masse volumique et sa quantit� restante
-	//communication.sendSlot(_pumps[pumpID].getLiquid()->getAvailable());
+	//Envoyer un message de statut contenant la quantite restante de l'emplacement
+	_communication.sendSlotStatus(_pumps[pumpID].getLiquid()->getAvailable());
 }
 
 void Distributor::getConfiguration() {
-	// TODO: Envoyer un message contenant les disponibilit�s pour chaque liquide
+	//Envoyer un message contenant les disponibilites pour chaque liquide
 	int conf[10];
 	for (int i = 0; i < 10; i++) {
 		conf[i] = _pumps[i].getLiquid()->getAvailable();
 	}
-	//communication.sendConfiguration(conf);
+	_communication.sendConfiguration(conf);
 	if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_EXPORT_COMPLETE);
 }
 
 void Distributor::emergencyStop() {
-	// TODO: Stopper toutes les actions du distributeur
-	//communication.sendStatus(STATUS_OK);
+	//Stopper toutes les actions du distributeur
+	_communication.sendStatus(STATUS_OK);
 }
