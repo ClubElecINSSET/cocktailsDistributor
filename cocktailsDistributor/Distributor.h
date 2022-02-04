@@ -64,9 +64,10 @@ private:
 	 void receivingCommand();
 
 	 /// <summary>
-	 /// Execute la commande reçue.
+	 /// Execute la commande recue.
 	 /// </summary>
-	 void executeCommand();
+	 /// <param name="command">L'objet commande recu.</param>
+	 void executeCommand(Command command);
 
 	 /// <summary>
 	 /// Ajoute un liquide � l'emplacement sp�cifi�.

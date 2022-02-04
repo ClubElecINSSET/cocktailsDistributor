@@ -3,13 +3,17 @@
 
 #include <DFRobotDFPlayerMini.h>
 
-#define WAITING_FOR_CUP 1
-#define START_POURING 2
-#define COCKTAIL_UNAVAILABLE 3
-#define STEP_POURING 4
-#define CUP_IS_REMOVED 5
-#define COCKTAIL_FINISHED 6
-#define RETIRE_CUP 7
+#define SOUND_ADD_LIQUID 1
+#define SOUND_USER_CALL 2
+#define SOUND_WAITING_CUP 3
+#define SOUND_START_COCKTAIL 4
+#define SOUND_POURING_STEP 5
+#define SOUND_COCKTAIL_FINISHED 6
+#define SOUND_CUP_REMOVAL 7
+#define SOUND_COCKTAIL_CANCELED 8
+#define SOUND_COCKTAIL_UNAVAILABLE 9
+#define SOUND_ANOMALY 10
+#define SOUND_EXPORT_COMPLETE 11
 
 /// <summary>
 /// Classe SoundNotification, organe de notification utilisateur.
