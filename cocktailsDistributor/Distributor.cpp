@@ -65,15 +65,15 @@ void Distributor::addLiquid(Liquid liquid, int pumpID) {
 	// TODO: V�rification du num�ro de pompe, si incorrect envoyer ERR
 	//if (pumpID < 0 || pumpID > sizeof(_pumps) - 1) _communication.sendStatus(STATUS_ERROR);
 	_pumps[pumpID].setLiquid(liquid);
+	if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_ADD_LIQUID);
 }
 
 void Distributor::receivingCommand() {
-	_communication.createCommand();
-	executeCommand();
+	Command command = _communication.captureCommand();
+	executeCommand(command);
 }
 
-void Distributor::executeCommand() {
-	Command command = _communication.getCommand();
+void Distributor::executeCommand(Command command) {
 	String name = command.getName();
 	if (name == "LIQU") {
 		//Ajout d'un nouveau liquide
@@ -123,20 +123,20 @@ bool Distributor::waitForCup() {
 }
 
 void Distributor::serveCocktail(Cocktail cocktail) {
-	//On v�rifie les quantit�s
+	//On verifie les quantit�s
 	if (checkQuantities(&cocktail)) {
 		//On attend qu'un gobelet soit disponible sur la plateforme
-		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(WAITING_FOR_CUP);
+		if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_WAITING_CUP);
 		if (waitForCup()) {
-			//Stock suffisant - on cr�e le cocktail
-			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(START_POURING);
-			//On ex�cute les instructions du cocktail les unes apr�s les autres
+			//Stock suffisant - on cree le cocktail
+			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_START_COCKTAIL);
+			//On execute les instructions du cocktail les unes apres les autres
 			for (int i = 0; i < Configuration::MAX_COCKTAIL_INSTRUCTIONS; i++) {
 				int pumpID = cocktail.getPumpID(i);
 				int amount = cocktail.getAmount(i);
 				if (amount != -1) {
 					int amountPoured = 0;
-					if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifyASync(STEP_POURING);
+					if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifyASync(SOUND_POURING_STEP);
 					//Remise a zero du capteur de gobelet
 					_cupSensor.tare();
 					//Versement du liquide
@@ -178,20 +178,19 @@ void Distributor::serveCocktail(Cocktail cocktail) {
 					if (anomaly) {
 						// TODO: Envoi d'un message ANOM
 						//_communication.sendStatus(STATUS_ANOMALY);
-						if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(CUP_IS_REMOVED);
+						if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_ANOMALY);
 						break;
 					}
 				}
 			}
-			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(COCKTAIL_FINISHED);
+			if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_FINISHED);
 			// TODO : Envoyer un message informant que le cocktail est terminé
 			//_communication.sendStatus(STATUS_ENDED);
 		}
-		// TODO : Enregistrer un message d'annulation de cocktail et envoyer un message d'annulation à la tablette
-		else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(COCKTAIL_FINISHED);
+		else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_CANCELED);
 		//_communication.sendStatus(STATUS_CANCELED);
 	}
-    else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(COCKTAIL_UNAVAILABLE);
+    else if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_COCKTAIL_UNAVAILABLE);
 }
 
 bool Distributor::checkQuantities(Cocktail* cocktail) {
@@ -230,6 +229,7 @@ void Distributor::getConfiguration() {
 		conf[i] = _pumps[i].getLiquid()->getAvailable();
 	}
 	//communication.sendConfiguration(conf);
+	if (Configuration::USE_SOUND_NOTIFICATIONS) _soundNotifier.notifySync(SOUND_EXPORT_COMPLETE);
 }
 
 void Distributor::emergencyStop() {
